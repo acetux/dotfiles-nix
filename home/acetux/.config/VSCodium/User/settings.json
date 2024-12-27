@@ -1,0 +1,7 @@
+{
+    "workbench.preferredLightColorTheme": "Catppuccin Latte",
+    "workbench.preferredDarkColorTheme": "Catppuccin Frappé",
+    "workbench.colorTheme": "Catppuccin Frappé",
+    "window.autoDetectColorScheme": true,
+    "editor.stickyScroll.enabled": false
+}
