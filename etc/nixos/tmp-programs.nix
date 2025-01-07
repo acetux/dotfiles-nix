@@ -43,7 +43,7 @@
     mesa-demos # Run in 'nix-shell' | Collection of demos and test programs for OpenGL and Mesa
     piglit # OpenGL test suite, and test-suite runner (unsure if this works)
     clinfo # OpenCL info
-    vdpauinfo # VA-API for Nvidia (probably need to install additional VDPAU components)
+    vdpauinfo # Tool to query the Video Decode and Presentation API for Unix (VDPAU) abilities of the system
     libva-utils # 'vainfo' | Collection of utilities and examples to exercise VA-API in accordance with the libva project.
     x86info # Identification utility for the x86 series of processors
   ];

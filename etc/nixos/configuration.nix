@@ -3,6 +3,10 @@
 
 { config, pkgs, ... }:
 
+let
+  unstable = import <nixos-unstable> { };
+in
+
 {
   imports =
     [
@@ -22,7 +26,7 @@
     thunderbird
     libreoffice
     vscodium # electron | If buggy: vscodium-fhs
-    #threema-desktop # electron | Is outdated and just threema-web in electron
+    #threema-desktop # electron | Is outdated and just an electron wrap of threema web
     signal-desktop # electron
     mumble
     #armcord/webcord/(vesktop) # FOSS Discord Client
@@ -43,6 +47,8 @@
     vim
     #neovim
     git
+    diffr # Better 'diff'
+    #icdiff # Better 'diff'
     unzip
     nvd # Diff for Nix Upgrades
 
@@ -55,6 +61,8 @@
     #fish # Shell
     #starship # Shell Prompt
     nixpkgs-fmt # Nix code formatter for nixpkgs (needed for vscodium .nix formatting)
+    #shellcheck-minimal # vscodium bash formatter dependency
+    #shfmt # vscodium bash formatter dependency
     #flameshot # Doesn't support Wayland yet
   ];
 
@@ -67,7 +75,7 @@
   };
 
   services.hardware.openrgb.enable = true; # https://wiki.nixos.org/wiki/OpenRGB
-  services.fwupd.enable = true;
+  #services.fwupd.enable = true;
   #services.openssh.enable = true; # Enable the OpenSSH daemon.
 
   nixpkgs.config.allowUnfree = true;
@@ -94,12 +102,11 @@
 
   # GRAPHICS
   programs.gamemode.enable = true; # Enable GameMode to optimise system performance on demand.
-  hardware.amdgpu.opencl.enable = true; # Enable OpenCL support using ROCM runtime library.
   hardware.graphics = {
-    enable = true; # Enables OpenGL (and possibly Vulkan (Mesa RADV), might be independently enabled by default now)
-    enable32Bit = true; # Enables OpenGL for 32 bit apps (and possibly Vulkan (Mesa RADV) for 32 bit apps, might be independently enabled by default now)
+    enable = true; # Installs Mesa with support for Vulkan (Mesa RADV), OpenGL, VA-API, and more
+    enable32Bit = true; # Same as "enable" but for 32 bit apps
     extraPackages = with pkgs; [
-      amdvlk # Enables AMDVLK in addition to the Mesa RADV drivers. The program will choose which one to use.
+      amdvlk # Enables the AMDVLK driver in addition to the Mesa RADV drivers. The program will choose which one to use.
       vulkan-volk # Can increase performance by skipping loader dispatch overhead.
       # Fixes some Vulkan apps (https://www.reddit.com/r/NixOS/comments/17i7zeb/comment/kpjmmqu/):
       vulkan-loader
@@ -107,9 +114,10 @@
       vulkan-extension-layer
     ];
     extraPackages32 = with pkgs; [
-      driversi686Linux.amdvlk # Enables AMDVLK for 32 bit apps in addition to the Mesa RADV drivers. The program will choose which one to use.
+      driversi686Linux.amdvlk # Same as "amdvlk" but for 32 bit apps
     ];
   };
+  hardware.amdgpu.opencl.enable = true; # Enable OpenCL support using ROCM runtime library.
   #boot.initrd.kernelModules = [ "amdgpu" ]; # Slows down boot by about 3 seconds
   #boot.kernelParams = [
   #  "video=DP-2:3440x1440@175" # Doesn't improve resolution
@@ -166,9 +174,6 @@
     wireless.enable = false; # Wireless support via wpa_supplicant
   };
 
-  fonts.packages = with pkgs; [
-    # List font packages here
-  ];
   #fonts.fontconfig.antialias = false; # Disable Font anti-aliasing
 
   # LOCALE

@@ -1,5 +1,9 @@
 { config, pkgs, ... }:
 
+let
+  unstable = import <nixos-unstable> { };
+in
+
 {
   imports =
     [
@@ -32,7 +36,7 @@
 
   # Dependencies for Mechabar (https://github.com/Sejjy/MechaBar):
   fonts.packages = with pkgs; [
-    nerd-fonts.jetbrains-mono
+    unstable.nerd-fonts.jetbrains-mono # Remove "unstable." & "let unstable import" on line 3 when NixOS 25.05 is released
   ];
 
   programs.hyprland = {
