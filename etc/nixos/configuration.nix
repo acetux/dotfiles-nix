@@ -44,7 +44,7 @@
     #neovim
     git
     diffr # Better 'diff'
-    #icdiff # Better 'diff'
+    icdiff # Better 'diff'
     unzip
     nvd # Diff for Nix Upgrades
 
@@ -90,19 +90,24 @@
   };
 
   networking.firewall = {
-    #enable = false;
+    enable = false;
     # Open ports:
     #allowedTCPPorts = [ ... ];
     #allowedUDPPorts = [ ... ];
   };
 
+  environment.variables = {
+    VDPAU_DRIVER = "radeonsi"; # Fix VDPAU
+    RUSTICL_ENABLE = "radeonsi"; # Should be enabled by default in rusticl sometime in the future
+  };
+
   # GRAPHICS
-  programs.gamemode.enable = true; # Enable GameMode to optimise system performance on demand.
   hardware.graphics = {
-    enable = true; # Installs Mesa with support for Vulkan (Mesa RADV), OpenGL, VA-API, and more
+    enable = true; # Installs Mesa with support for Vulkan (Mesa RADV), OpenGL, VA-API, VDPAU and more
     enable32Bit = true; # Same as "enable" but for 32 bit apps
     extraPackages = with pkgs; [
-      amdvlk # Enables the AMDVLK driver in addition to the Mesa RADV drivers. The program will choose which one to use.
+      mesa.opencl # Enables OpenCL support using Mesa rusticl and Clover instead of AMD ROCm via "hardware.amdgpu.opencl.enable"
+      amdvlk # Enables the AMDVLK driver in addition to the Mesa RADV drivers. AMDVLK is the default but RADV can be set with env var: AMD_VULKAN_ICD=RADV
       vulkan-volk # Can increase performance by skipping loader dispatch overhead.
       # Fixes some Vulkan apps (https://www.reddit.com/r/NixOS/comments/17i7zeb/comment/kpjmmqu/):
       vulkan-loader
@@ -113,7 +118,7 @@
       driversi686Linux.amdvlk # Same as "amdvlk" but for 32 bit apps
     ];
   };
-  hardware.amdgpu.opencl.enable = true; # Enable OpenCL support using ROCM runtime library.
+  programs.gamemode.enable = true; # Enable GameMode to optimise system performance on demand.
   #boot.initrd.kernelModules = [ "amdgpu" ]; # Slows down boot by about 3 seconds
   #boot.kernelParams = [
   #  "video=DP-2:3440x1440@175" # Doesn't improve resolution
