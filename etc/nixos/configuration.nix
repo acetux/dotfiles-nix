@@ -4,14 +4,14 @@
 { config, pkgs, ... }:
 
 {
-  imports =
-    [
-      ./hardware-configuration.nix # Include the results of the hardware scan.
-      ./hyprland.nix
-      #./kde-plasma.nix
-      ./fetches.nix
-      #./tmp-programs.nix
-    ];
+  imports = [
+    ./hardware-configuration.nix # Include the results of the hardware scan.
+    ./encrypted-dns.nix
+    ./hyprland.nix
+    #./kde-plasma.nix
+    ./fetches.nix
+    #./tmp-programs.nix
+  ];
 
   # List packages installed in system profile. To search, run 'nix search wget'
   environment.systemPackages = with pkgs; [
@@ -22,6 +22,7 @@
     thunderbird
     libreoffice
     vscodium # electron | If buggy: vscodium-fhs
+    okteta # Hex editor
     #threema-desktop # electron | Is outdated and just an electron wrap of threema web
     signal-desktop # electron
     mumble
@@ -35,18 +36,21 @@
 
     # CLI PROGRAMS
     wget
+    unzip
+    dig
+    whois
+    traceroute
     mtr
-    htop
-    (btop.override { rocmSupport = true; }) # btop with AMD GPU monitoring support (https://github.com/NixOS/nixpkgs/pull/296468#issuecomment-2304572044)
-    iotop-c
     #mc # Midnight Commander | Alternatives: yazi/nnn/lf/ranger
     vim
     #neovim
     git
-    diffr # Better 'diff'
-    icdiff # Better 'diff'
-    unzip
     nvd # Diff for Nix Upgrades
+    icdiff # Better 'diff'
+    diffr # Better 'diff'
+    htop
+    (btop.override { rocmSupport = true; }) # btop with AMD GPU monitoring support (https://github.com/NixOS/nixpkgs/pull/296468#issuecomment-2304572044)
+    iotop-c
 
     # SYSTEM CONTROL
     openrgb # https://wiki.nixos.org/wiki/OpenRGB
@@ -54,11 +58,12 @@
     mangohud # Alternative: goverlay
 
     # MISC
-    #fish # Shell
-    #starship # Shell Prompt
-    nixpkgs-fmt # Nix code formatter for nixpkgs (needed for vscodium .nix formatting)
-    #shellcheck-minimal # vscodium bash formatter dependency
-    #shfmt # vscodium bash formatter dependency
+    #fish # Shell (Probably has to be configured as a module)
+    #starship # Shell Prompt (Probably has to be configured as a module)
+    nixpkgs-fmt # VSCodium NixLang formatter dependency
+    vim-language-server # VSCodium VIM formatter dependency
+    #shellcheck-minimal # VSCodium Bash formatter dependency
+    #shfmt # VSCodium Bash formatter dependency
     #flameshot # Doesn't support Wayland yet
   ];
 
@@ -72,7 +77,6 @@
 
   services.hardware.openrgb.enable = true; # https://wiki.nixos.org/wiki/OpenRGB
   #services.fwupd.enable = true;
-  #services.openssh.enable = true; # Enable the OpenSSH daemon.
 
   nixpkgs.config.allowUnfree = true;
   #nixpkgs.config.rocmSupport = true; # Enable support for AMD ROCm config wide (https://github.com/NixOS/nixpkgs/pull/296468#issuecomment-2304572044)
@@ -107,7 +111,7 @@
     enable32Bit = true; # Same as "enable" but for 32 bit apps
     extraPackages = with pkgs; [
       mesa.opencl # Enables OpenCL support using Mesa rusticl and Clover instead of AMD ROCm via "hardware.amdgpu.opencl.enable"
-      amdvlk # Enables the AMDVLK driver in addition to the Mesa RADV drivers. AMDVLK is the default but RADV can be set with env var: AMD_VULKAN_ICD=RADV
+      amdvlk # Enables the AMDVLK driver in addition to the Mesa RADV drivers. Default can be set with env var: AMD_VULKAN_ICD=AMDVLK/RADV
       vulkan-volk # Can increase performance by skipping loader dispatch overhead.
       # Fixes some Vulkan apps (https://www.reddit.com/r/NixOS/comments/17i7zeb/comment/kpjmmqu/):
       vulkan-loader
@@ -150,7 +154,7 @@
 
   # SOUND
   # Remove sound.enable or set it to false if you had it set previously, as sound.enable is only meant for ALSA-based configurations
-  security.rtkit.enable = true; # Optional but recommended
+  security.rtkit.enable = true; # Enable the RealtimeKit system service, which hands out realtime scheduling priority to user processes on demand. For example, PulseAudio and PipeWire use this to acquire realtime priority.
   services.pipewire = {
     enable = true;
     alsa.enable = true;
@@ -161,19 +165,24 @@
 
   security.polkit.enable = true; # Framework for programs to request sudo authentication
 
-  # Define a user account. Don't forget to set a password with 'passwd'.
+  # Don't forget to set a password with 'passwd'
   users.users.acetux = {
     isNormalUser = true;
-    description = "acetux";
-    extraGroups = [ "networkmanager" "wheel" ];
+    extraGroups = [ "wheel" "networkmanager" ];
     packages = with pkgs; [ ];
   };
 
   networking = {
-    hostName = "nix-acetux-01"; # Define your hostname.
-    networkmanager.enable = true; # Enable networking non-declaratively via NetworkManager
+    hostName = "nix-acetux-01";
+    networkmanager.enable = false; # 'nmcli' | Use only instead of dhcpcd if needing to switch between multiple connections, manage Wi-Fi, or use VPNs
+    dhcpcd.enable = true; # DHCP Client. Much leaner than NetworkManager
     wireless.enable = false; # Wireless support via wpa_supplicant
   };
+
+  services.openssh.enable = false; # Makes sure the OpenSSH daemon/server never gets enabled, even if the default changed
+  programs.ssh.hostKeyAlgorithms = [
+    "ssh-ed25519" # Which SSH host key algorithms to accept when connecting to a server
+  ];
 
   #fonts.fontconfig.antialias = false; # Disable Font anti-aliasing
 
@@ -194,14 +203,15 @@
   # Configure keymap in X11
   #services.xserver.xkb = {
   #  layout = "ch";
-  #  variant = "";
+  #  variant = "pc105";
   #};
   console = {
     keyMap = "sg"; # Configure console keymap ('sg' = Swiss German)
-    # Doesn't work correctly, font at end of Stage 2 and TTY Font reset to default after reboot:
-    #earlySetup = true; # Enable setting virtual console options as early as possible (in initrd).
+    #earlySetup = true; # Enable setting virtual console options as early as possible (in initrd). | (Doesn't work correctly, font at end of Stage 2 and TTY Font reset to default after reboot)
     #font = "${pkgs.tamzen}/share/consolefonts/Tamzen10x20.psf"; # (https://www.reddit.com/r/NixOS/comments/qnk89n/comment/j9b9xy0) | Find font location to list them: 'nix-index' 'nix-locate Lat2-Terminus16'
   };
+
+  powerManagement.enable = false; # Disable laptop stuff
 
   boot.loader = {
     timeout = 3;
@@ -214,11 +224,7 @@
     };
   };
   #boot.initrd.systemd.enable = true; # SystemD as PID1 for faster Plymouth and TTY resolution initialization (https://www.reddit.com/r/NixOS/comments/qnk89n/comment/j9b9xy0)
-  #boot.consoleLogLevel = 4; # Default. Kernel console log level
-
-  # Configure network proxy if necessary:
-  #networking.proxy.default = "http://user:password@proxy:port/";
-  #networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
+  #boot.consoleLogLevel = 4; # Default | Kernel console log level
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions

@@ -6,7 +6,6 @@
   environment.systemPackages = with pkgs; [
     # GUI PROGRAMS
     nwg-look
-    okteta # Hex editor
     mission-center # Win11 like top (taskmanager)
     superTuxKart
 
