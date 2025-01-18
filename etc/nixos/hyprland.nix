@@ -1,11 +1,10 @@
 { config, pkgs, ... }:
 
 {
-  imports =
-    [
-      ./gnome-polkit.nix # Polkit authenticator for GUI programs in Hyprland
-      #./greetd.nix # Alternative to Ly for Hyprland
-    ];
+  imports = [
+    ./gnome-polkit.nix # Polkit authenticator for GUI programs in Hyprland
+    #./greetd.nix # Alternative to Ly for Hyprland
+  ];
 
   environment.systemPackages = with pkgs; [
     terminator
@@ -14,16 +13,19 @@
     waybar
     wpaperd
     rofi-wayland
-    #rose-pine-cursor # Doesn't appear in nwg-look. "Installed" manually.
     playerctl
+    wl-clip-persist # Persists clipboard when the copied from program stops running
     #hyprpolkitagent # Polkit auth agent
     #lxqt.lxqt-policykit # Polkit auth agent
+    #rose-pine-cursor # Doesn't appear in nwg-look. "Installed" manually.
     #xdg-desktop-portal-hyprland # Gets installed when hyprland=enabled (https://wiki.hyprland.org/Hypr-Ecosystem/xdg-desktop-portal-hyprland/) (For copy-paste, screen-sharing, etc.)
-    wl-clip-persist # Persists clipboard when the copied from program stops running
 
-    # Dependencies for Mechabar (https://github.com/Sejjy/MechaBar):
+    # Dependencies for MechaBar (https://github.com/Sejjy/MechaBar):
     python3
+    jq
+    lm_sensors
     wlogout
+    parallel
     #networkmanager
   ];
   #security.soteria.enable = true; # Polkit auth agent
