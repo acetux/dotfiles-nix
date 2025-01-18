@@ -60,11 +60,11 @@
     # MISC
     #fish # Shell (Probably has to be configured as a module)
     #starship # Shell Prompt (Probably has to be configured as a module)
-    nixpkgs-fmt # VSCodium NixLang formatter dependency
+    #flameshot # Doesn't support Wayland yet
+    nixfmt-rfc-style # VSCodium NixLang formatter dependency
     vim-language-server # VSCodium VIM formatter dependency
     #shellcheck-minimal # VSCodium Bash formatter dependency
     #shfmt # VSCodium Bash formatter dependency
-    #flameshot # Doesn't support Wayland yet
   ];
 
   boot.kernelPackages = pkgs.linuxPackages_latest; # Use latest stable Linux kernel
@@ -150,7 +150,10 @@
   };
 
   # Disable setting access times on files and dirs to improve SSD lifespan and performance:
-  fileSystems."/".options = [ "noatime" "nodiratime" ]; # Can cause issues with some programs (https://stackpointer.io/unix/linux-io-performance-tuning-noatime-nodiratime-relatime/388/)
+  fileSystems."/".options = [
+    "noatime"
+    "nodiratime"
+  ]; # Can cause issues with some programs (https://stackpointer.io/unix/linux-io-performance-tuning-noatime-nodiratime-relatime/388/)
 
   # SOUND
   # Remove sound.enable or set it to false if you had it set previously, as sound.enable is only meant for ALSA-based configurations
@@ -168,7 +171,10 @@
   # Don't forget to set a password with 'passwd'
   users.users.acetux = {
     isNormalUser = true;
-    extraGroups = [ "wheel" "networkmanager" ];
+    extraGroups = [
+      "wheel"
+      "networkmanager"
+    ];
     packages = with pkgs; [ ];
   };
 

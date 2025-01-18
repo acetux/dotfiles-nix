@@ -46,7 +46,7 @@
   # Display Manager
   services.displayManager = {
     ly = {
-      enable = true; #https://discourse.nixos.org/t/how-to-use-ly-display-manager/13753/10
+      enable = true; # https://discourse.nixos.org/t/how-to-use-ly-display-manager/13753/10
       settings = { };
     };
   };

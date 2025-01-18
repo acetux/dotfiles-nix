@@ -20,7 +20,10 @@ in
 
   # Make sure encrypted DNS servers don't get overridden:
   networking = {
-    nameservers = [ "127.0.0.1" "::1" ];
+    nameservers = [
+      "127.0.0.1"
+      "::1"
+    ];
     resolvconf.enable = false;
     dhcpcd.extraConfig = "nohook resolv.conf"; # In case dhcpcd is enabled
     networkmanager.dns = "none"; # In case NetworkManager is enabled
@@ -29,8 +32,7 @@ in
   # Empty /etc/resolv.conf:
   environment.etc = {
     "resolv.conf" = {
-      text = ''
-      '';
+      text = '''';
       #mode = "0444"; # Default
     };
   };
@@ -51,7 +53,7 @@ in
 
       # Use servers reachable over IPv6 if "hasIPv6Internet = true;"
       ipv6_servers = hasIPv6Internet;
-      block_ipv6 = ! (hasIPv6Internet);
+      block_ipv6 = !(hasIPv6Internet);
 
       cache_min_ttl = 0;
       cache_neg_min_ttl = 0;
@@ -59,8 +61,14 @@ in
 
       lb_strategy = "first";
 
-      listen_addresses = [ "127.0.0.1:53" "[::1]:53" ];
-      bootstrap_resolvers = [ "9.9.9.9:53" "[2620:fe::fe]:53" ]; # Put valid standard resolver addresses here. Your actual queries will not be sent there. If you're using DNSCrypt or Anonymized DNS and your lists are up to date, these resolvers will not even be used.
+      listen_addresses = [
+        "127.0.0.1:53"
+        "[::1]:53"
+      ];
+      bootstrap_resolvers = [
+        "9.9.9.9:53"
+        "[2620:fe::fe]:53"
+      ]; # Put valid standard resolver addresses here. Your actual queries will not be sent there. If you're using DNSCrypt or Anonymized DNS and your lists are up to date, these resolvers will not even be used.
       netprobe_address = "9.9.9.9:53";
 
       require_dnssec = true;
