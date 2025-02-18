@@ -29,11 +29,14 @@ in
     networkmanager.dns = "none"; # In case NetworkManager is enabled
   };
 
-  # Empty /etc/resolv.conf:
+  # Set dnscrypt-proxy 2 listeners in /etc/resolv.conf for certain software like policyd-spf (mail) which doesn't work otherwise:
   environment.etc = {
     "resolv.conf" = {
-      text = '''';
-      #mode = "0444"; # Default
+      text = ''
+        nameserver 127.0.0.1
+        nameserver ::1
+      '';
+      mode = "0444"; # Default
     };
   };
 

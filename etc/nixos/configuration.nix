@@ -17,7 +17,6 @@
   environment.systemPackages = with pkgs; [
     # GUI PROGRAMS
     kitty
-    firefox
     mullvad-browser
     thunderbird
     libreoffice
@@ -25,7 +24,7 @@
     okteta # Hex editor
     #threema-desktop # electron | Is outdated and just an electron wrap of threema web
     signal-desktop # electron
-    mumble
+    #mumble
     #armcord/webcord/(vesktop) # FOSS Discord Client
     pavucontrol
     easyeffects
@@ -35,10 +34,12 @@
     lutris
 
     # CLI PROGRAMS
+    tree
     wget
     unzip
     dig
     whois
+    rdap # Official WHOIS replacement
     traceroute
     mtr
     #mc # Midnight Commander | Alternatives: yazi/nnn/lf/ranger
@@ -46,6 +47,7 @@
     #neovim
     git
     nvd # Diff for Nix Upgrades
+    nix-tree # Interactive user interface for 'nix-store -q --tree /run/current-system'
     icdiff # Better 'diff'
     diffr # Better 'diff'
     htop
@@ -66,8 +68,13 @@
     #shellcheck-minimal # VSCodium Bash formatter dependency
     #shfmt # VSCodium Bash formatter dependency
   ];
+  nixpkgs.config.allowUnfree = true;
 
   boot.kernelPackages = pkgs.linuxPackages_latest; # Use latest stable Linux kernel
+
+  programs.firefox = {
+    enable = true;
+  };
 
   programs.steam = {
     enable = true; # unfree, X11, 32bit
@@ -78,7 +85,6 @@
   services.hardware.openrgb.enable = true; # https://wiki.nixos.org/wiki/OpenRGB
   #services.fwupd.enable = true;
 
-  nixpkgs.config.allowUnfree = true;
   #nixpkgs.config.rocmSupport = true; # Enable support for AMD ROCm config wide (https://github.com/NixOS/nixpkgs/pull/296468#issuecomment-2304572044)
 
   programs.bash = {
@@ -89,6 +95,7 @@
       l = "ll";
       mv = "mv -i";
       du = "du -ah --max-depth=1 --threshold=4100";
+      tree = "tree -a";
       dotf = "git --git-dir=$HOME/git-repos/dotfiles-nix.git/ --work-tree=/";
     };
   };
@@ -179,7 +186,7 @@
   };
 
   networking = {
-    hostName = "nix-acetux-01";
+    hostName = "ws-at-nix-01";
     networkmanager.enable = false; # 'nmcli' | Use only instead of dhcpcd if needing to switch between multiple connections, manage Wi-Fi, or use VPNs
     dhcpcd.enable = true; # DHCP Client. Much leaner than NetworkManager
     wireless.enable = false; # Wireless support via wpa_supplicant
