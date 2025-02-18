@@ -10,7 +10,7 @@
     terminator
     krusader
 
-    waybar
+    waybar # Replace with HyprPanel when it's available in nixpkgs
     wpaperd
     rofi-wayland
     playerctl
@@ -51,7 +51,11 @@
     };
   };
 
-  # Media keyboard keys (Doesn't work - now implemented directly in Hyprland conf)
+  programs.firefox.preferences = {
+    "media.hardwaremediakeys.enabled" = false; # Disable media keys because otherwise firefox always takes priority over spotify for example
+  };
+
+  # Media keyboard keys (Doesn't work; is implemented directly in Hyprland conf now)
   #services.actkbd = {
   #  enable = true;
   #  bindings = [
