@@ -3,5 +3,6 @@
     "workbench.preferredDarkColorTheme": "Catppuccin Frappé",
     "workbench.colorTheme": "Catppuccin Frappé",
     "window.autoDetectColorScheme": true,
-    "editor.stickyScroll.enabled": false
+    "editor.stickyScroll.enabled": false,
+    "extensions.autoUpdate": false
 }
